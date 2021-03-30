@@ -75,9 +75,9 @@ class Fraction(nominator: Int, denominator: Int = 1) {
     override fun toString(): String = if (denominator != 1) "$nominator/$denominator" else "$nominator"
 }
 
-fun MutableList<Fraction>.minValue(): Fraction {
+fun MutableList<Fraction>.minValue(): Pair<Fraction, Int> {
     val fractionList = this.map { it.nominator / it.denominator }.drop(1)
-    return this[fractionList.binarySearch(fractionList.minOrNull()!!)]
+    return Pair(this[fractionList.binarySearch(fractionList.minOrNull()!!)], fractionList.binarySearch(fractionList.minOrNull()!!))
 }
 
 fun MutableList<Fraction>.isContainsMinus(): Boolean {

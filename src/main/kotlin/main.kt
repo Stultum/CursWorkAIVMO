@@ -9,8 +9,8 @@ fun main() {
         Fraction(3),
         Fraction(7),
         Fraction(1),
-        Fraction(1),
-        Fraction(11)
+        Fraction(-1),
+        Fraction(-11)
     )
     artBasis.printSimplexTable()
 }

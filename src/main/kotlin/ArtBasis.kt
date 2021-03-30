@@ -18,6 +18,7 @@ class ArtBasis(
     private val zList = mutableListOf<Fraction>()
     private val mList = mutableListOf<Fraction>()
     private val basisList = mutableListOf(6, 7, 8)
+    private val simplexRelativeList = mutableListOf<Fraction>()
     private val alreadyUsedBasisList = mutableListOf<Int>()
 
     init {
@@ -85,6 +86,28 @@ class ArtBasis(
             add(Fraction(0, 1))
         }
 
+        with(simplexRelativeList) {
+            val minIndex = mList.minValue().second
+            if(aList[minIndex].nominator != 0) {
+                add(aList[0].divide(aList[minIndex]))
+            }
+            else {
+                add(Fraction(99999))
+            }
+            if(bList[minIndex].nominator != 0) {
+                add(bList[0].divide(bList[minIndex]))
+            }
+            else {
+                add(Fraction(99999))
+            }
+            if(cList[minIndex].nominator != 0) {
+                add(cList[0].divide(cList[minIndex]))
+            }
+            else {
+                add(Fraction(99999))
+            }
+        }
+
     }
 
     fun printSimplexTable() {
@@ -105,7 +128,11 @@ class ArtBasis(
             aList[6].toString(),
             aList[7].toString(),
             aList[8].toString(),
-            "0"
+            if(simplexRelativeList[0].nominator != 99999) {
+                simplexRelativeList[0].toString()
+            } else {
+                "---"
+            }
         )
         print("\n")
         System.out.format(
@@ -120,7 +147,11 @@ class ArtBasis(
             bList[6].toString(),
             bList[7].toString(),
             bList[8].toString(),
-            "0"
+            if(simplexRelativeList[1].nominator != 99999) {
+                simplexRelativeList[1].toString()
+            } else {
+                "---"
+            }
         )
         print("\n")
         System.out.format(
@@ -135,7 +166,11 @@ class ArtBasis(
             cList[6].toString(),
             cList[7].toString(),
             cList[8].toString(),
-            "0"
+            if(simplexRelativeList[2].nominator != 99999) {
+                simplexRelativeList[2].toString()
+            } else {
+                "---"
+            }
         )
         print("\n")
         System.out.format(
