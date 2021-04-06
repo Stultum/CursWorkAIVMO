@@ -13,7 +13,7 @@ fun main() {
         Fraction(7),
         Fraction(0),
         Fraction(-1),
-        Fraction(0),
+        Fraction(0)
     )
     val cList = mutableListOf(
         Fraction(11),
@@ -21,7 +21,7 @@ fun main() {
         Fraction(1),
         Fraction(0),
         Fraction(0),
-        Fraction(-1),
+        Fraction(-1)
     )
     val zList = mutableListOf(
         Fraction(-1),

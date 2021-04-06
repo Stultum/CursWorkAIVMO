@@ -1,3 +1,4 @@
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 class Fraction(nominator: Int, denominator: Int = 1) {
@@ -31,6 +32,10 @@ class Fraction(nominator: Int, denominator: Int = 1) {
         if (nominator == 0) {
             denominator = 1
             return
+        }
+        if (nominator < 0 && denominator < 0) {
+            nominator = abs(nominator)
+            denominator = abs(denominator)
         }
         val gcd = gCD(nominator, denominator)
         nominator /= gcd
@@ -76,8 +81,22 @@ class Fraction(nominator: Int, denominator: Int = 1) {
 }
 
 fun MutableList<Fraction>.minValue(): Pair<Fraction, Int> {
-    val fractionList = this.map { it.nominator / it.denominator }.drop(1)
-    return Pair(this[fractionList.binarySearch(fractionList.minOrNull()!!)], fractionList.binarySearch(fractionList.minOrNull()!!))
+    val fractionList: List<Double> = this.map { it.nominator.toDouble() / it.denominator.toDouble() }
+    println(fractionList)
+    println(fractionList[0])
+    var minValue = 99999.0
+    var minIndex = 99999
+    for (i in 1 until this.size) {
+        if(fractionList[i] < minValue) {
+            minValue = fractionList[i]
+            minIndex = i
+        }
+    }
+    println("index = $minIndex, value = ${this[minIndex]}")
+    return Pair(
+        this[minIndex],
+        minIndex
+    )
 }
 
 fun MutableList<Fraction>.isContainsMinus(): Boolean {

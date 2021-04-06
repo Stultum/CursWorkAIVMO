@@ -34,11 +34,9 @@ class ArtBasis(
                 for (j in 0 until limitCount) {
                     res = res.plus(limitsList[j][i])
                 }
-                if (isEmpty()) {
-                    add(res.multiply(Fraction(-1)))
-                } else {
-                    add(res)
-                }
+                add(res.multiply(Fraction(-1)))
+
+
             }
             add(Fraction(0, 1))
             add(Fraction(0, 1))
@@ -153,7 +151,7 @@ class ArtBasis(
         for (i in 0 until limitCount) {
             val currentCoefficient =
                 if (i == currentMin.second) currentMin.third else limitsList[i][currentMin.first].divide(currentMin.third)
-            println(currentCoefficient.toString())
+            println("current coef = $currentCoefficient")
             for (j in 0 until xCount) {
                 if (i == currentMin.second) {
                     newSimplexTable[i][j] = limitsList[i][j].divide(currentCoefficient)
@@ -227,6 +225,6 @@ class ArtBasis(
     private fun getMinElemParams() {
         val minM = mList.minValue()
         val minSR = simplexRelativeList.minValue().second
-        currentMin = Triple(minM.second, minSR, minM.first)
+        currentMin = Triple(minM.second, minSR, limitsList[minSR][minM.second])
     }
 }
