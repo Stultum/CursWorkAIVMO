@@ -12,6 +12,12 @@ class Fraction(nominator: Int, denominator: Int = 1) {
         reduce()
     }
 
+    fun isLowerThanZero(): Boolean {
+        return if (nominator < 0 && denominator >= 0)
+            true
+        else nominator >= 0 && denominator < 0
+    }
+
     private fun gCD(firstNumber: Int, secondNumber: Int): Int {
         if (secondNumber == 0) {
             throw IllegalArgumentException("Деление на 0")
@@ -28,6 +34,8 @@ class Fraction(nominator: Int, denominator: Int = 1) {
         return first
     }
 
+    private fun lCM(firstNumber: Int, secondNumber: Int) = firstNumber * secondNumber / gCD(firstNumber, secondNumber)
+
     private fun reduce() {
         if (nominator == 0) {
             denominator = 1
@@ -43,7 +51,7 @@ class Fraction(nominator: Int, denominator: Int = 1) {
     }
 
     fun plus(second: Fraction): Fraction {
-        val gcd = gCD(denominator, second.denominator)
+        val gcd = lCM(denominator, second.denominator)
         val firstTmp = Fraction(nominator * (denominator / gcd), denominator * (denominator / gcd))
         val secondTmp =
             Fraction(second.nominator * (second.denominator / gcd), second.denominator * (second.denominator / gcd))
@@ -53,11 +61,9 @@ class Fraction(nominator: Int, denominator: Int = 1) {
     }
 
     fun minus(second: Fraction): Fraction {
-        val gcd = gCD(denominator, second.denominator)
-        val firstTmp = Fraction(nominator * (denominator / gcd), denominator * (denominator / gcd))
-        val secondTmp =
-            Fraction(second.nominator * (second.denominator / gcd), second.denominator * (second.denominator / gcd))
-        val result = Fraction(firstTmp.nominator - secondTmp.nominator, firstTmp.denominator)
+        val gcd = lCM(denominator, second.denominator)
+        val result =
+            Fraction(this.nominator * (gcd / this.denominator) - second.nominator * (gcd / second.denominator), gcd)
         result.reduce()
         return result
     }
@@ -80,19 +86,32 @@ class Fraction(nominator: Int, denominator: Int = 1) {
     override fun toString(): String = if (denominator != 1) "$nominator/$denominator" else "$nominator"
 }
 
-fun MutableList<Fraction>.minValue(): Pair<Fraction, Int> {
+fun MutableList<Fraction>.minValueLim(): Pair<Fraction, Int> {
     val fractionList: List<Double> = this.map { it.nominator.toDouble() / it.denominator.toDouble() }
-    println(fractionList)
-    println(fractionList[0])
     var minValue = 99999.0
     var minIndex = 99999
     for (i in 1 until this.size) {
-        if(fractionList[i] < minValue) {
+        if (fractionList[i] < minValue) {
             minValue = fractionList[i]
             minIndex = i
         }
     }
-    println("index = $minIndex, value = ${this[minIndex]}")
+    return Pair(
+        this[minIndex],
+        minIndex
+    )
+}
+
+fun MutableList<Fraction>.minValue(): Pair<Fraction, Int> {
+    val fractionList: List<Double> = this.map { it.nominator.toDouble() / it.denominator.toDouble() }
+    var minValue = 99999.0
+    var minIndex = 99999
+    for (i in 0 until this.size) {
+        if (fractionList[i] < minValue) {
+            minValue = fractionList[i]
+            minIndex = i
+        }
+    }
     return Pair(
         this[minIndex],
         minIndex
@@ -100,9 +119,9 @@ fun MutableList<Fraction>.minValue(): Pair<Fraction, Int> {
 }
 
 fun MutableList<Fraction>.isContainsMinus(): Boolean {
-    val fractionList = this.map { it.nominator / it.denominator }.drop(1)
+    val fractionList = this.drop(1)
     fractionList.forEach {
-        if (it < 0) {
+        if (it.nominator < 0 || it.denominator < 0) {
             return true
         }
     }

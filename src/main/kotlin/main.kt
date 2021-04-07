@@ -30,6 +30,35 @@ fun main() {
         Fraction(0),
         Fraction(0)
     )
+//    println(Fraction(2, 1).minus(Fraction(-2,3)).toString())
+//    println("asd")
+//    val aList = mutableListOf(
+//        Fraction(2),
+//        Fraction(1),
+//        Fraction(1),
+//        Fraction(2),
+//        Fraction(-1),
+//    )
+//    val bList = mutableListOf(
+//        Fraction(6),
+//        Fraction(2),
+//        Fraction(1),
+//        Fraction(-3),
+//        Fraction(1),
+//    )
+//    val cList = mutableListOf(
+//        Fraction(7),
+//        Fraction(1),
+//        Fraction(1),
+//        Fraction(1),
+//        Fraction(1),
+//    )
+//    val zList = mutableListOf(
+//        Fraction(2),
+//        Fraction(-1),
+//        Fraction(-1),
+//        Fraction(-1),
+//    )
     val limits = mutableListOf(aList, bList, cList)
     val artBasis = ArtBasis(
         zList,
@@ -40,5 +69,4 @@ fun main() {
     artBasis.addBasisVariables()
     artBasis.printSimplexTable()
     artBasis.countNewTable()
-    artBasis.printSimplexTable()
 }

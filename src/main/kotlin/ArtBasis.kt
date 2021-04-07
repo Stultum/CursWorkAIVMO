@@ -1,5 +1,5 @@
 class ArtBasis(
-    zConstructorList: MutableList<Fraction>,
+    val zConstructorList: MutableList<Fraction>,
     xConstructorCount: Int,
     limitConstructorCount: Int,
     limitsConstructorList: MutableList<MutableList<Fraction>>
@@ -20,6 +20,9 @@ class ArtBasis(
         limitCount = limitConstructorCount
         xCount = xConstructorCount
 
+        zConstructorList.forEachIndexed { index, fraction ->
+            zConstructorList[index] = zConstructorList[index].multiply(Fraction(-1))
+        }
         with(zList) {
             add(Fraction(0, 1))
             addAll(zConstructorList)
@@ -142,21 +145,24 @@ class ArtBasis(
         System.out.format("---------------------------------------------------------------------------------------")
         print("\n")
         getMinElemParams()
-        println(currentMin)
     }
 
     fun countNewTable() {
+        val tmp = basisList[currentMin.second]
+        val list = mutableListOf<Fraction>()
+        list.addAll(limitsList[currentMin.second])
+        alreadyUsedBasisList.add(tmp)
+        basisList[currentMin.second] = currentMin.first
         val newSimplexTable = mutableListOf<MutableList<Fraction>>()
         newSimplexTable.addAll(limitsList)
         for (i in 0 until limitCount) {
-            val currentCoefficient =
-                if (i == currentMin.second) currentMin.third else limitsList[i][currentMin.first].divide(currentMin.third)
-            println("current coef = $currentCoefficient")
-            for (j in 0 until xCount) {
+            var currentCoefficient =
+                if (i == currentMin.second) currentMin.third else limitsList[i][currentMin.first].divide((currentMin.third))
+            for (j in 0 until xCount + 3) {
                 if (i == currentMin.second) {
                     newSimplexTable[i][j] = limitsList[i][j].divide(currentCoefficient)
                 } else {
-                    val minusValue = currentCoefficient.multiply(limitsList[currentMin.second][j])
+                    val minusValue = currentCoefficient.multiply(list[j])
                     newSimplexTable[i][j] = limitsList[i][j].minus(minusValue)
                 }
             }
@@ -164,17 +170,17 @@ class ArtBasis(
 
         val newZList = mutableListOf<Fraction>()
         newZList.addAll(zList)
-        val zListCoefficient = zList[currentMin.first].multiply(currentMin.third)
-        for (i in 0 until xCount) {
-            val minusValue = zListCoefficient.multiply(limitsList[currentMin.second][i])
+        val zListCoefficient = zList[currentMin.first].divide(currentMin.third)
+        for (i in 0 until xCount + 3) {
+            val minusValue = zListCoefficient.multiply(list[i])
             newZList[i] = zList[i].minus(minusValue)
         }
 
         val newMList = mutableListOf<Fraction>()
         newMList.addAll(mList)
         val mListCoefficient = mList[currentMin.first].divide(currentMin.third)
-        for (i in 0 until xCount) {
-            val minusValue = mListCoefficient.multiply(limitsList[currentMin.second][i])
+        for (i in 0 until xCount + 3) {
+            val minusValue = mListCoefficient.multiply(list[i])
             newMList[i] = mList[i].minus(minusValue)
         }
 
@@ -188,7 +194,48 @@ class ArtBasis(
 
         mList.clear()
         mList.addAll(newMList)
+        val listToCheck = mutableListOf<Fraction>()
+        listToCheck.addAll(newMList)
         newMList.clear()
+
+        countSimplexRelatives()
+        printSimplexTable()
+        if(listToCheck.isContainsMinus()) {
+            countNewTable()
+        } else {
+            val resultsPairs = mutableListOf<Pair<Int, Fraction>>()
+            basisList.forEachIndexed { index, i ->
+                resultsPairs.add(Pair(basisList[index], limitsList[index][0]))
+            }
+            val resultList = mutableListOf<Fraction>()
+            for(i in 0 until xCount){
+                var isAdded = false
+                resultsPairs.forEachIndexed { index, pair ->
+                    if(i+1 == pair.first) {
+                        resultList.add(pair.second)
+                        isAdded = true
+                    }
+                }
+                if(!isAdded){
+                    resultList.add(Fraction(0))
+                }
+            }
+            print("Zmin(")
+            resultList.forEach {
+                print(it.toString())
+                print(",")
+            }
+            var answer = Fraction(0)
+            zConstructorList.forEachIndexed { index, fraction ->
+                zConstructorList[index] = zConstructorList[index].multiply(Fraction(-1))
+            }
+            resultList.forEachIndexed { index, fraction ->
+                var plus = zConstructorList[index].multiply(fraction)
+                answer=answer.plus(plus)
+            }
+            print(") = ")
+            println(answer.toString())
+        }
     }
 
     fun addBasisVariables() {
@@ -201,19 +248,20 @@ class ArtBasis(
                     tmpInCycle.add(Fraction(0))
                 }
             }
-            println(tmpInCycle)
             limitsList[i].addAll(tmpInCycle)
             tmpInCycle.clear()
         }
-        println(limitsList)
     }
 
     private fun countSimplexRelatives() {
         simplexRelativeList.clear()
         with(simplexRelativeList) {
-            val minIndex = mList.minValue().second
+            val minIndex = mList.minValueLim().second
             for (i in 0 until limitCount) {
-                if (limitsList[i][minIndex].nominator != 0) {
+                if (limitsList[i][minIndex].nominator != 0 &&
+                    limitsList[i][0].divide(limitsList[i][minIndex]).nominator > 0 &&
+                    limitsList[i][0].divide(limitsList[i][minIndex]).denominator > 0
+                ) {
                     add(limitsList[i][0].divide(limitsList[i][minIndex]))
                 } else {
                     add(Fraction(99999))
@@ -223,7 +271,7 @@ class ArtBasis(
     }
 
     private fun getMinElemParams() {
-        val minM = mList.minValue()
+        val minM = mList.minValueLim()
         val minSR = simplexRelativeList.minValue().second
         currentMin = Triple(minM.second, minSR, limitsList[minSR][minM.second])
     }
