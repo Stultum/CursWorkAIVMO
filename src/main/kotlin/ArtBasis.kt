@@ -156,7 +156,7 @@ class ArtBasis(
         val newSimplexTable = mutableListOf<MutableList<Fraction>>()
         newSimplexTable.addAll(limitsList)
         for (i in 0 until limitCount) {
-            var currentCoefficient =
+            val currentCoefficient =
                 if (i == currentMin.second) currentMin.third else limitsList[i][currentMin.first].divide((currentMin.third))
             for (j in 0 until xCount + 3) {
                 if (i == currentMin.second) {
@@ -200,7 +200,7 @@ class ArtBasis(
 
         countSimplexRelatives()
         printSimplexTable()
-        if(listToCheck.isContainsMinus()) {
+        if (listToCheck.isContainsMinus()) {
             countNewTable()
         } else {
             val resultsPairs = mutableListOf<Pair<Int, Fraction>>()
@@ -208,15 +208,15 @@ class ArtBasis(
                 resultsPairs.add(Pair(basisList[index], limitsList[index][0]))
             }
             val resultList = mutableListOf<Fraction>()
-            for(i in 0 until xCount){
+            for (i in 0 until xCount) {
                 var isAdded = false
                 resultsPairs.forEachIndexed { index, pair ->
-                    if(i+1 == pair.first) {
+                    if (i + 1 == pair.first) {
                         resultList.add(pair.second)
                         isAdded = true
                     }
                 }
-                if(!isAdded){
+                if (!isAdded) {
                     resultList.add(Fraction(0))
                 }
             }
@@ -231,7 +231,8 @@ class ArtBasis(
             }
             resultList.forEachIndexed { index, fraction ->
                 var plus = zConstructorList[index].multiply(fraction)
-                answer=answer.plus(plus)
+                plus = plus.multiply(Fraction(-1))
+                answer = answer.plus(plus)
             }
             print(") = ")
             println(answer.toString())
