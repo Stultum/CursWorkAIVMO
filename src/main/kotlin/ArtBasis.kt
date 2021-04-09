@@ -149,6 +149,7 @@ class ArtBasis(
 
     fun countNewTable() {
         val tmp = basisList[currentMin.second]
+        println("current min = $currentMin")
         val list = mutableListOf<Fraction>()
         list.addAll(limitsList[currentMin.second])
         alreadyUsedBasisList.add(tmp)
