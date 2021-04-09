@@ -204,6 +204,68 @@ class ArtBasis(
         if (listToCheck.isContainsMinus()) {
             countNewTable()
         } else {
+            listToCheck.forEachIndexed { index, fraction ->
+                if (fraction.nominator != 0 && index < xCount) {
+                    println("Решений нет")
+                    return
+                }
+            }
+            limitsList.forEachIndexed { index, mutableList ->
+                mutableList.dropLast(3)
+            }
+            countSimplexRelativesZ()
+            printSimplexTableZ()
+            countTableZ()
+        }
+    }
+
+    private fun countTableZ() {
+        countSimplexRelativesZ()
+        getMinElemParamsZ()
+        val tmp = basisList[currentMin.second]
+        println("current minZ = $currentMin")
+        val list = mutableListOf<Fraction>()
+        list.addAll(limitsList[currentMin.second])
+        alreadyUsedBasisList.add(tmp)
+        basisList[currentMin.second] = currentMin.first
+        val newSimplexTable = mutableListOf<MutableList<Fraction>>()
+        newSimplexTable.addAll(limitsList)
+        for (i in 0 until limitCount) {
+            val currentCoefficient =
+                if (i == currentMin.second) currentMin.third else limitsList[i][currentMin.first].divide((currentMin.third))
+            for (j in 0 until xCount) {
+                if (i == currentMin.second) {
+                    newSimplexTable[i][j] = limitsList[i][j].divide(currentCoefficient)
+                } else {
+                    val minusValue = currentCoefficient.multiply(list[j])
+                    newSimplexTable[i][j] = limitsList[i][j].minus(minusValue)
+                }
+            }
+        }
+
+        val newZList = mutableListOf<Fraction>()
+        newZList.addAll(zList)
+        val zListCoefficient = zList[currentMin.first].divide(currentMin.third)
+        for (i in 0 until xCount + 3) {
+            val minusValue = zListCoefficient.multiply(list[i])
+            newZList[i] = zList[i].minus(minusValue)
+        }
+
+        limitsList.clear()
+        limitsList.addAll(newSimplexTable)
+        newSimplexTable.clear()
+
+        zList.clear()
+        zList.addAll(newZList)
+        val listToCheck = mutableListOf<Fraction>()
+        newZList.clear()
+
+        countSimplexRelativesZ()
+        printSimplexTableZ()
+
+        if (listToCheck.isContainsMinus()) {
+            countTableZ()
+        } else {
             val resultsPairs = mutableListOf<Pair<Int, Fraction>>()
             basisList.forEachIndexed { index, i ->
                 resultsPairs.add(Pair(basisList[index], limitsList[index][0]))
@@ -272,9 +334,104 @@ class ArtBasis(
         }
     }
 
+    private fun countSimplexRelativesZ() {
+        simplexRelativeList.clear()
+        with(simplexRelativeList) {
+            val minIndex = zList.minValueLim().second
+            for (i in 0 until limitCount) {
+                if (limitsList[i][minIndex].nominator != 0 &&
+                    limitsList[i][0].divide(limitsList[i][minIndex]).nominator > 0 &&
+                    limitsList[i][0].divide(limitsList[i][minIndex]).denominator > 0
+                ) {
+                    add(limitsList[i][0].divide(limitsList[i][minIndex]))
+                } else {
+                    add(Fraction(99999))
+                }
+            }
+        }
+    }
+
+    private fun getMinElemParamsZ() {
+        val zListNew = zList.dropLast(3).toMutableList()
+        val minZ = zListNew.minValueLim()
+        val minSR = simplexRelativeList.minValue().second
+        currentMin = Triple(minZ.second, minSR, limitsList[minSR][minZ.second])
+    }
+
     private fun getMinElemParams() {
         val minM = mList.minValueLim()
         val minSR = simplexRelativeList.minValue().second
         currentMin = Triple(minM.second, minSR, limitsList[minSR][minM.second])
+    }
+
+    fun printSimplexTableZ() {
+        val leftAlignFormat = "|%-5s|%-7s|%-7s|%-7s|%-7s|%-7s|%-7s|%-7s|"
+        System.out.format("---------------------------------------------------------------")
+        print("\n")
+        System.out.format("| Б.П |   1   |   x1  |   x2  |   x3  |   x4  |   x5  |   СО  |")
+        print("\n")
+        System.out.format(
+            leftAlignFormat,
+            "x" + basisList[0].toString(),
+            limitsList[0][0].toString(),
+            limitsList[0][1].toString(),
+            limitsList[0][2].toString(),
+            limitsList[0][3].toString(),
+            limitsList[0][4].toString(),
+            limitsList[0][5].toString(),
+            if (simplexRelativeList[0].nominator != 99999) {
+                simplexRelativeList[0].toString()
+            } else {
+                "---"
+            }
+        )
+        print("\n")
+        System.out.format(
+            leftAlignFormat,
+            "x" + basisList[1].toString(),
+            limitsList[1][0].toString(),
+            limitsList[1][1].toString(),
+            limitsList[1][2].toString(),
+            limitsList[1][3].toString(),
+            limitsList[1][4].toString(),
+            limitsList[1][5].toString(),
+            if (simplexRelativeList[1].nominator != 99999) {
+                simplexRelativeList[1].toString()
+            } else {
+                "---"
+            }
+        )
+        print("\n")
+        System.out.format(
+            leftAlignFormat,
+            "x" + basisList[2].toString(),
+            limitsList[2][0].toString(),
+            limitsList[2][1].toString(),
+            limitsList[2][2].toString(),
+            limitsList[2][3].toString(),
+            limitsList[2][4].toString(),
+            limitsList[2][5].toString(),
+            if (simplexRelativeList[2].nominator != 99999) {
+                simplexRelativeList[2].toString()
+            } else {
+                "---"
+            }
+        )
+        print("\n")
+        System.out.format(
+            leftAlignFormat,
+            "Z",
+            zList[0].toString(),
+            zList[1].toString(),
+            zList[2].toString(),
+            zList[3].toString(),
+            zList[4].toString(),
+            zList[5].toString(),
+            "-"
+        )
+        print("\n")
+        System.out.format("---------------------------------------------------------------")
+        print("\n")
+        getMinElemParams()
     }
 }

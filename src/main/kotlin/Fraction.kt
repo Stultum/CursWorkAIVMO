@@ -120,6 +120,7 @@ fun MutableList<Fraction>.minValue(): Pair<Fraction, Int> {
 
 fun MutableList<Fraction>.isContainsMinus(): Boolean {
     val fractionList = this.drop(1)
+    //println(this)
     fractionList.forEach {
         if (it.nominator < 0 || it.denominator < 0) {
             return true
