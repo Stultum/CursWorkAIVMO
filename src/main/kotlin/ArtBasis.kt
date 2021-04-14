@@ -1,5 +1,5 @@
 class ArtBasis(
-    val zConstructorList: MutableList<Fraction>,
+    private val zConstructorList: MutableList<Fraction>,
     xConstructorCount: Int,
     limitConstructorCount: Int,
     limitsConstructorList: MutableList<MutableList<Fraction>>
@@ -20,7 +20,7 @@ class ArtBasis(
         limitCount = limitConstructorCount
         xCount = xConstructorCount
 
-        zConstructorList.forEachIndexed { index, fraction ->
+        zConstructorList.forEachIndexed { index, _ ->
             zConstructorList[index] = zConstructorList[index].multiply(Fraction(-1))
         }
         with(zList) {
@@ -210,7 +210,7 @@ class ArtBasis(
                     return
                 }
             }
-            limitsList.forEachIndexed { index, mutableList ->
+            limitsList.forEachIndexed { _, mutableList ->
                 mutableList.dropLast(3)
             }
             countSimplexRelativesZ()
@@ -267,13 +267,13 @@ class ArtBasis(
             countTableZ()
         } else {
             val resultsPairs = mutableListOf<Pair<Int, Fraction>>()
-            basisList.forEachIndexed { index, i ->
+            basisList.forEachIndexed { index, _ ->
                 resultsPairs.add(Pair(basisList[index], limitsList[index][0]))
             }
             val resultList = mutableListOf<Fraction>()
             for (i in 0 until xCount) {
                 var isAdded = false
-                resultsPairs.forEachIndexed { index, pair ->
+                resultsPairs.forEachIndexed { _, pair ->
                     if (i + 1 == pair.first) {
                         resultList.add(pair.second)
                         isAdded = true
@@ -283,13 +283,13 @@ class ArtBasis(
                     resultList.add(Fraction(0))
                 }
             }
-            print("Zmin(")
+            print("Z min(")
             resultList.forEach {
                 print(it.toString())
                 print(",")
             }
             var answer = Fraction(0)
-            zConstructorList.forEachIndexed { index, fraction ->
+            zConstructorList.forEachIndexed { index, _ ->
                 zConstructorList[index] = zConstructorList[index].multiply(Fraction(-1))
             }
             resultList.forEachIndexed { index, fraction ->
@@ -364,7 +364,7 @@ class ArtBasis(
         currentMin = Triple(minM.second, minSR, limitsList[minSR][minM.second])
     }
 
-    fun printSimplexTableZ() {
+    private fun printSimplexTableZ() {
         val leftAlignFormat = "|%-5s|%-7s|%-7s|%-7s|%-7s|%-7s|%-7s|%-7s|"
         System.out.format("---------------------------------------------------------------")
         print("\n")
